@@ -1,6 +1,35 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 const Banner: React.FC = () => {
+  const [isVisible, setIsVisible] = useState(true);
+
+  useEffect(() => {
+    let frame = 0;
+
+    const updateVisibility = () => {
+      frame = 0;
+      setIsVisible(window.scrollY < 24);
+    };
+
+    const onScroll = () => {
+      if (frame) {
+        return;
+      }
+
+      frame = window.requestAnimationFrame(updateVisibility);
+    };
+
+    updateVisibility();
+    window.addEventListener("scroll", onScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (frame) {
+        window.cancelAnimationFrame(frame);
+      }
+    };
+  }, []);
+
   const scrollTo = (id: string) => (e: React.MouseEvent) => {
     e.preventDefault();
     const el = document.getElementById(id);
@@ -8,51 +37,67 @@ const Banner: React.FC = () => {
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm border-b">
-      <div className="container mx-auto px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <h1 className="text-2xl font-bold">Jane Doe</h1>
-          <span className="text-sm text-gray-500 dark:text-gray-300">
-            Developer • Designer
-          </span>
-        </div>
+    <>
+      <div
+        className="banner-hover-strip fixed left-0 right-0 top-0 z-50 h-4"
+        onMouseEnter={() => setIsVisible(true)}
+        onMouseLeave={() => setIsVisible(window.scrollY < 24)}
+        aria-hidden="true"
+      />
 
-        <nav className="hidden md:flex items-center gap-3">
-          <a
-            href="#about"
-            onClick={scrollTo("about")}
-            className="px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded"
-          >
-            About
-          </a>
-          <a
-            href="#projects"
-            onClick={scrollTo("projects")}
-            className="px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded"
-          >
-            Projects
-          </a>
-          <a
-            href="#posts"
-            onClick={scrollTo("posts")}
-            className="px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded"
-          >
-            Posts
-          </a>
-          <a
-            href="#contact"
-            onClick={scrollTo("contact")}
-            className="px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded"
-          >
-            Contact
-          </a>
-        </nav>
+      <header
+        className={`fixed left-0 right-0 top-0 z-40 border-b border-white/10 bg-slate-950/70 backdrop-blur-xl transition-transform duration-300 ease-out ${
+          isVisible ? "translate-y-0" : "-translate-y-full"
+        }`}
+        onMouseEnter={() => setIsVisible(true)}
+      >
+        <div className="container mx-auto flex items-center justify-between px-6 py-4">
+          <div className="flex items-center gap-4">
+            <h1 className="text-2xl font-bold text-white">Andy Liu</h1>
+            <span className="text-sm text-slate-300/80">
+              Computer Engineer
+            </span>
+          </div>
 
-        <div className="md:hidden">
-          <button className="px-3 py-2 border rounded">Menu</button>
+          <nav className="hidden items-center gap-3 md:flex">
+            <a
+              href="#about"
+              onClick={scrollTo("about")}
+              className="rounded-full px-3 py-2 text-slate-200 transition-colors hover:bg-white/10"
+            >
+              About
+            </a>
+            <a
+              href="#projects"
+              onClick={scrollTo("projects")}
+              className="rounded-full px-3 py-2 text-slate-200 transition-colors hover:bg-white/10"
+            >
+              Projects
+            </a>
+            <a
+              href="#posts"
+              onClick={scrollTo("posts")}
+              className="rounded-full px-3 py-2 text-slate-200 transition-colors hover:bg-white/10"
+            >
+              Posts
+            </a>
+            <a
+              href="#contact"
+              onClick={scrollTo("contact")}
+              className="rounded-full px-3 py-2 text-slate-200 transition-colors hover:bg-white/10"
+            >
+              Contact
+            </a>
+          </nav>
+
+          <div className="md:hidden">
+            <button className="rounded-full border border-white/15 bg-white/5 px-3 py-2 text-white">
+              Menu
+            </button>
+          </div>
         </div>
-      </div>
-    </header>
+      </header>
+    </>
   );
 };
 
